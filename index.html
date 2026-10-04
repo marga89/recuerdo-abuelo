@@ -182,88 +182,87 @@
            CARGAR FOTOS DE GOOGLE DRIVE
            ============================== */
 
-        async function cargarFotos() {
+async function cargarFotos() {
 
-            const url =
-                "https://www.googleapis.com/drive/v3/files" +
-                "?q=" +
-                encodeURIComponent(
-                    "'" +
-                    FOLDER_ID +
-                    "' in parents and trashed = false"
-                ) +
-                "&fields=files(id,name,mimeType)" +
-                "&pageSize=100" +
-                "&key=" +
-                API_KEY;
+    const url =
+        "https://www.googleapis.com/drive/v3/files" +
+        "?q=" +
+        encodeURIComponent(
+            "'" +
+            FOLDER_ID +
+            "' in parents and trashed = false"
+        ) +
+        "&fields=files(id,name,mimeType),nextPageToken" +
+        "&pageSize=100" +
+        "&key=" +
+        API_KEY;
 
+    try {
 
-            try {
+        const respuesta =
+            await fetch(url);
 
-                const respuesta =
-                    await fetch(url);
+        if (!respuesta.ok) {
 
+            cargando.textContent =
+                "No se han podido cargar las fotografías.";
 
-                if (!respuesta.ok) {
-
-                    cargando.textContent =
-                        "No se han podido cargar las fotografías.";
-
-                    return;
-                }
-
-
-                const datos =
-                    await respuesta.json();
-
-
-                fotos =
-                    datos.files.filter(
-                        archivo =>
-                            archivo.mimeType &&
-                            archivo.mimeType.startsWith("image/")
-                    );
-                fotos.sort(() => Math.random() - 0.5);
-
-
-                if (fotos.length === 0) {
-
-                    cargando.textContent =
-                        "No se encontraron fotografías.";
-
-                    return;
-                }
-
-
-                /* Ocultar mensaje */
-
-                cargando.style.display =
-                    "none";
-
-
-                /* Mostrar primera foto */
-
-                mostrarFoto();
-
-
-                /* Cambiar cada 7 segundos */
-
-                setInterval(
-                    mostrarFoto,
-                    7000
-                );
-
-            }
-
-            catch (error) {
-
-                cargando.textContent =
-                    "No se han podido cargar las fotografías.";
-
-                console.error(error);
-            }
+            return;
         }
 
+        const datos =
+            await respuesta.json();
+
+        fotos =
+            datos.files.filter(
+                archivo =>
+                    archivo.mimeType &&
+                    archivo.mimeType.startsWith("image/")
+            );
+
+        if (fotos.length === 0) {
+
+            cargando.textContent =
+                "No se encontraron fotografías.";
+
+            return;
+        }
+
+        // Mezclar TODAS las fotos aleatoriamente
+        for (let i = fotos.length - 1; i > 0; i--) {
+
+            const j =
+                Math.floor(Math.random() * (i + 1));
+
+            [fotos[i], fotos[j]] =
+                [fotos[j], fotos[i]];
+        }
+
+        console.log(
+            "Fotografías cargadas:",
+            fotos.length
+        );
+
+        cargando.style.display =
+            "none";
+
+        mostrarFoto();
+
+        setInterval(
+            mostrarFoto,
+            7000
+        );
+
+    }
+
+    catch (error) {
+
+        cargando.textContent =
+            "No se han podido cargar las fotografías.";
+
+        console.error(error);
+    }
+}
 
         /* ==============================
            MOSTRAR FOTOGRAFÍA
