@@ -23,23 +23,52 @@
         .pantalla {
             width: 100vw;
             height: 100vh;
+            position: relative;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
         }
 
         .nombre {
-            font-size: clamp(32px, 5vw, 70px);
-            margin-bottom: 35px;
+            position: absolute;
+            top: 35px;
+            left: 45px;
+            z-index: 10;
+            font-size: clamp(28px, 3vw, 55px);
             font-weight: normal;
             letter-spacing: 2px;
-            text-align: center;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.7);
+        }
+
+        .presentacion {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            background: #111;
         }
 
         .foto {
-            width: 65vw;
-            height: 65vh;
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+        }
+
+        .foto.visible {
+            opacity: 1;
+        }
+
+        .cargando {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #ccc;
         }
     </style>
 </head>
@@ -52,9 +81,115 @@
             José Ferrer Picó
         </div>
 
-        <div class="foto"></div>
+        <div class="presentacion">
+            <div class="cargando" id="cargando">
+                Cargando fotografías...
+            </div>
+
+            <img id="foto1" class="foto">
+            <img id="foto2" class="foto">
+        </div>
 
     </div>
+
+    <script>
+
+        // PEGA AQUÍ TU CLAVE DE API
+        const API_KEY = "AIzaSyD6suEF2ak4JoMcpFBJhhLbF87FL_zyRD4";
+
+        // Carpeta "Fotos iaio"
+        const FOLDER_ID = "1Uu7ZvlVQ3yAMQKY5w6bOpyrmrnAJnXL7";
+
+        let fotos = [];
+        let indice = 0;
+        let fotoActual = 1;
+
+        const foto1 = document.getElementById("foto1");
+        const foto2 = document.getElementById("foto2");
+        const cargando = document.getElementById("cargando");
+
+        async function cargarFotos() {
+
+            const url =
+                "https://www.googleapis.com/drive/v3/files" +
+                "?q=" + encodeURIComponent(
+                    "'" + FOLDER_ID + "' in parents and trashed = false"
+                ) +
+                "&fields=files(id,name,mimeType)" +
+                "&pageSize=100" +
+                "&key=" + API_KEY;
+
+            try {
+
+                const respuesta = await fetch(url);
+
+                if (!respuesta.ok) {
+                    throw new Error("Error al consultar Google Drive");
+                }
+
+                const datos = await respuesta.json();
+
+                fotos = datos.files.filter(
+                    archivo => archivo.mimeType &&
+                    archivo.mimeType.startsWith("image/")
+                );
+
+                if (fotos.length === 0) {
+                    cargando.textContent = "No se encontraron fotografías.";
+                    return;
+                }
+
+                cargando.style.display = "none";
+
+                mostrarFoto();
+
+                setInterval(mostrarFoto, 7000);
+
+            } catch (error) {
+
+                console.error(error);
+
+                cargando.textContent =
+                    "No se han podido cargar las fotografías.";
+            }
+        }
+
+        function mostrarFoto() {
+
+            const archivo = fotos[indice];
+
+            const urlFoto =
+                "https://drive.google.com/thumbnail?id=" +
+                archivo.id +
+                "&sz=w1920";
+
+            const siguiente =
+                fotoActual === 1 ? foto2 : foto1;
+
+            const actual =
+                fotoActual === 1 ? foto1 : foto2;
+
+            siguiente.src = urlFoto;
+
+            siguiente.onload = function() {
+
+                siguiente.classList.add("visible");
+                actual.classList.remove("visible");
+
+                fotoActual =
+                    fotoActual === 1 ? 2 : 1;
+
+                indice++;
+
+                if (indice >= fotos.length) {
+                    indice = 0;
+                }
+            };
+        }
+
+        cargarFotos();
+
+    </script>
 
 </body>
 </html>
