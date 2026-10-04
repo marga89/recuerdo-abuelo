@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>José Ferrer Picó</title>
 
     <style>
@@ -10,25 +11,27 @@
             box-sizing: border-box;
         }
 
-        html, body {
+        html,
+        body {
             margin: 0;
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background: #111;
+            background: #111111;
             font-family: Georgia, "Times New Roman", serif;
-            color: white;
         }
 
         .pantalla {
             width: 100vw;
             height: 100vh;
+            background: #111111;
+            color: #f2eee8;
             display: flex;
             flex-direction: column;
-            background: #111;
         }
 
-        /* PARTE SUPERIOR FIJA */
+        /* CABECERA */
+
         .cabecera {
             height: 30vh;
             min-height: 220px;
@@ -39,30 +42,34 @@
             background: #151515;
         }
 
-.nombre {
-    font-size: clamp(28px, 2.8vw, 46px);
-    font-weight: normal;
-    letter-spacing: 2px;
-    color: #f2eee8;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.6);
-}
-
-        /* ESPACIO RESERVADO PARA LA FOTO DE JOSÉ */
-        .foto-jose {
-            height: 25vh;
-            max-height: 230px;
-            width: 320px;
+        .nombre {
+            font-size: clamp(28px, 2.8vw, 46px);
+            font-weight: normal;
+            letter-spacing: 2px;
+            color: #f2eee8;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
         }
 
-        /* PARTE INFERIOR */
+        .foto-jose {
+            height: 22vh;
+            max-height: 190px;
+            width: auto;
+            max-width: 240px;
+            object-fit: contain;
+            border-radius: 4px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+        }
+
+        /* ZONA DE FOTOGRAFÍAS */
+
         .presentacion {
             position: relative;
             flex: 1;
             overflow: hidden;
-            background: #0d0d0d;
+            background: #111111;
         }
 
-        .foto {
+        .presentacion img {
             position: absolute;
             inset: 0;
             width: 100%;
@@ -72,19 +79,21 @@
             transition: opacity 2s ease-in-out;
         }
 
-        .foto.visible {
+        .presentacion img.visible {
             opacity: 1;
         }
 
-        .cargando {
+        /* MENSAJE DE CARGA */
+
+        #cargando {
             position: absolute;
             inset: 0;
             display: flex;
             align-items: center;
             justify-content: center;
+            color: #d8d2ca;
             font-size: 24px;
-            color: #ccc;
-            z-index: 5;
+            letter-spacing: 1px;
         }
     </style>
 </head>
@@ -93,92 +102,140 @@
 
     <div class="pantalla">
 
-        <!-- CABECERA FIJA -->
-        <div class="cabecera">
+        <header class="cabecera">
 
             <div class="nombre">
                 José Ferrer Picó
             </div>
 
-            <div class="foto-jose"></div>
+            <img
+                class="foto-jose"
+                src="fotos/foto.jpeg"
+                alt="José Ferrer Picó"
+            >
 
-        </div>
+        </header>
 
+        <main class="presentacion">
 
-        <!-- FOTOS FAMILIARES -->
-        <div class="presentacion">
-
-            <div class="cargando" id="cargando">
+            <div id="cargando">
                 Cargando fotografías...
             </div>
 
-            <img id="foto1" class="foto">
-            <img id="foto2" class="foto">
+            <img id="foto1" alt="">
+            <img id="foto2" alt="">
 
-        </div>
+        </main>
 
     </div>
 
-
     <script>
 
-        // TU CLAVE DE GOOGLE DRIVE
+        /* ==============================
+           CONFIGURACIÓN GOOGLE DRIVE
+           ============================== */
+
         const API_KEY = "AIzaSyD6suEF2ak4JoMcpFBJhhLbF87FL_zyRD4";
 
-        // Carpeta "Fotos iaio"
-        const FOLDER_ID = "1Uu7ZvlVQ3yAMQKY5w6bOpyrmrnAJnXL7";
+        const FOLDER_ID =
+            "1Uu7ZvlVQ3yAMQKY5w6bOpyrmrnAJnXL7";
+
+
+        /* ==============================
+           VARIABLES
+           ============================== */
 
         let fotos = [];
         let indice = 0;
         let fotoActual = 1;
 
-        const foto1 = document.getElementById("foto1");
-        const foto2 = document.getElementById("foto2");
-        const cargando = document.getElementById("cargando");
+        const foto1 =
+            document.getElementById("foto1");
 
+        const foto2 =
+            document.getElementById("foto2");
+
+        const cargando =
+            document.getElementById("cargando");
+
+
+        /* ==============================
+           CARGAR FOTOS DE GOOGLE DRIVE
+           ============================== */
 
         async function cargarFotos() {
 
             const url =
                 "https://www.googleapis.com/drive/v3/files" +
-                "?q=" + encodeURIComponent(
-                    "'" + FOLDER_ID + "' in parents and trashed = false"
+                "?q=" +
+                encodeURIComponent(
+                    "'" +
+                    FOLDER_ID +
+                    "' in parents and trashed = false"
                 ) +
                 "&fields=files(id,name,mimeType)" +
                 "&pageSize=100" +
-                "&key=" + API_KEY;
+                "&key=" +
+                API_KEY;
+
 
             try {
 
-                const respuesta = await fetch(url);
+                const respuesta =
+                    await fetch(url);
+
 
                 if (!respuesta.ok) {
+
                     cargando.textContent =
                         "No se han podido cargar las fotografías.";
+
                     return;
                 }
 
-                const datos = await respuesta.json();
 
-                fotos = datos.files.filter(
-                    archivo =>
-                        archivo.mimeType &&
-                        archivo.mimeType.startsWith("image/")
-                );
+                const datos =
+                    await respuesta.json();
+
+
+                fotos =
+                    datos.files.filter(
+                        archivo =>
+                            archivo.mimeType &&
+                            archivo.mimeType.startsWith("image/")
+                    );
+
 
                 if (fotos.length === 0) {
+
                     cargando.textContent =
                         "No se encontraron fotografías.";
+
                     return;
                 }
 
-                cargando.style.display = "none";
+
+                /* Ocultar mensaje */
+
+                cargando.style.display =
+                    "none";
+
+
+                /* Mostrar primera foto */
 
                 mostrarFoto();
 
-                setInterval(mostrarFoto, 7000);
 
-            } catch (error) {
+                /* Cambiar cada 7 segundos */
+
+                setInterval(
+                    mostrarFoto,
+                    7000
+                );
+
+            }
+
+            catch (error) {
 
                 cargando.textContent =
                     "No se han podido cargar las fotografías.";
@@ -188,40 +245,72 @@
         }
 
 
+        /* ==============================
+           MOSTRAR FOTOGRAFÍA
+           ============================== */
+
         function mostrarFoto() {
 
-            const archivo = fotos[indice];
+            const archivo =
+                fotos[indice];
+
 
             const urlFoto =
                 "https://drive.google.com/thumbnail?id=" +
                 archivo.id +
                 "&sz=w1920";
 
+
             const siguiente =
-                fotoActual === 1 ? foto2 : foto1;
+                fotoActual === 1
+                    ? foto2
+                    : foto1;
+
 
             const actual =
-                fotoActual === 1 ? foto1 : foto2;
+                fotoActual === 1
+                    ? foto1
+                    : foto2;
 
-            siguiente.src = urlFoto;
 
-            siguiente.onload = function() {
+            siguiente.src =
+                urlFoto;
 
-                siguiente.classList.add("visible");
 
-                actual.classList.remove("visible");
+            siguiente.onload =
+                function() {
 
-                fotoActual =
-                    fotoActual === 1 ? 2 : 1;
+                    siguiente.classList.add(
+                        "visible"
+                    );
 
-                indice++;
+                    actual.classList.remove(
+                        "visible"
+                    );
 
-                if (indice >= fotos.length) {
-                    indice = 0;
-                }
-            };
+
+                    fotoActual =
+                        fotoActual === 1
+                            ? 2
+                            : 1;
+
+
+                    indice++;
+
+
+                    if (
+                        indice >= fotos.length
+                    ) {
+
+                        indice = 0;
+                    }
+                };
         }
 
+
+        /* ==============================
+           INICIAR
+           ============================== */
 
         cargarFotos();
 
