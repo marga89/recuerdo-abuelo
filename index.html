@@ -212,13 +212,18 @@ async function cargarFotos() {
 
         const datos =
             await respuesta.json();
+fotos = datos.files;
 
-        fotos =
-            datos.files.filter(
-                archivo =>
-                    archivo.mimeType &&
-                    archivo.mimeType.startsWith("image/")
-            );
+console.log("TOTAL ARCHIVOS EN LA CARPETA:", fotos.length);
+
+console.log(
+    "ARCHIVOS QUE NO SON IMAGEN:",
+    fotos.filter(
+        archivo =>
+            !archivo.mimeType ||
+            !archivo.mimeType.startsWith("image/")
+    )
+);
 
         if (fotos.length === 0) {
 
