@@ -223,6 +223,7 @@
                             archivo.mimeType &&
                             archivo.mimeType.startsWith("image/")
                     );
+                fotos.sort(() => Math.random() - 0.5);
 
 
                 if (fotos.length === 0) {
