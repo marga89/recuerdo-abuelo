@@ -46,14 +46,11 @@
             text-shadow: 0 2px 8px rgba(0,0,0,0.7);
         }
 
+        /* ESPACIO RESERVADO PARA LA FOTO DE JOSÉ */
         .foto-jose {
             height: 25vh;
             max-height: 230px;
-            width: auto;
-            max-width: 320px;
-            object-fit: contain;
-            border-radius: 4px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+            width: 320px;
         }
 
         /* PARTE INFERIOR */
@@ -86,6 +83,7 @@
             justify-content: center;
             font-size: 24px;
             color: #ccc;
+            z-index: 5;
         }
     </style>
 </head>
@@ -101,11 +99,7 @@
                 José Ferrer Picó
             </div>
 
-            <img
-                class="foto-jose"
-                src="fotos/foto.jpeg"
-                alt="José Ferrer Picó"
-            >
+            <div class="foto-jose"></div>
 
         </div>
 
