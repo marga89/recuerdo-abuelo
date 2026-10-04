@@ -69,6 +69,8 @@
             justify-content: center;
             font-size: 24px;
             color: #ccc;
+            text-align: center;
+            padding: 30px;
         }
     </style>
 </head>
@@ -82,19 +84,22 @@
         </div>
 
         <div class="presentacion">
+
             <div class="cargando" id="cargando">
                 Cargando fotografías...
             </div>
 
             <img id="foto1" class="foto">
             <img id="foto2" class="foto">
+
         </div>
 
     </div>
 
+
     <script>
 
-        // PEGA AQUÍ TU CLAVE DE API
+        // TU CLAVE DE GOOGLE DRIVE
         const API_KEY = "AIzaSyD6suEF2ak4JoMcpFBJhhLbF87FL_zyRD4";
 
         // Carpeta "Fotos iaio"
@@ -108,7 +113,10 @@
         const foto2 = document.getElementById("foto2");
         const cargando = document.getElementById("cargando");
 
+
         async function cargarFotos() {
+
+            cargando.textContent = "Probando conexión...";
 
             const url =
                 "https://www.googleapis.com/drive/v3/files" +
@@ -124,35 +132,47 @@
                 const respuesta = await fetch(url);
 
                 if (!respuesta.ok) {
-                    throw new Error("Error al consultar Google Drive");
+
+                    cargando.textContent =
+                        "ERROR GOOGLE: " + respuesta.status;
+
+                    return;
                 }
 
                 const datos = await respuesta.json();
 
                 fotos = datos.files.filter(
-                    archivo => archivo.mimeType &&
-                    archivo.mimeType.startsWith("image/")
+                    archivo =>
+                        archivo.mimeType &&
+                        archivo.mimeType.startsWith("image/")
                 );
 
+                cargando.textContent =
+                    "Fotos encontradas: " + fotos.length;
+
                 if (fotos.length === 0) {
-                    cargando.textContent = "No se encontraron fotografías.";
                     return;
                 }
 
-                cargando.style.display = "none";
+                setTimeout(() => {
 
-                mostrarFoto();
+                    cargando.style.display = "none";
 
-                setInterval(mostrarFoto, 7000);
+                    mostrarFoto();
+
+                    setInterval(mostrarFoto, 7000);
+
+                }, 2000);
 
             } catch (error) {
 
-                console.error(error);
-
                 cargando.textContent =
-                    "No se han podido cargar las fotografías.";
+                    "ERROR DE CONEXIÓN";
+
+                console.error(error);
             }
         }
+
 
         function mostrarFoto() {
 
@@ -174,6 +194,7 @@
             siguiente.onload = function() {
 
                 siguiente.classList.add("visible");
+
                 actual.classList.remove("visible");
 
                 fotoActual =
@@ -186,6 +207,7 @@
                 }
             };
         }
+
 
         cargarFotos();
 
