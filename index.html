@@ -30,17 +30,20 @@
             flex-direction: column;
         }
 
-        /* CABECERA */
+        /* ==============================
+           CABECERA
+           ============================== */
 
-.cabecera {
-    height: 20vh;
-    min-height: 150px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px 45px;
-    background: #151515;
-}
+        .cabecera {
+            height: 22vh;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 45px;
+            background: #151515;
+            flex-shrink: 0;
+        }
 
         .nombre {
             font-size: clamp(28px, 2.8vw, 46px);
@@ -49,23 +52,36 @@
             color: #f2eee8;
             text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
         }
-.foto-jose {
-    display: block;
-    width: 140px;
-    height: 140px;
-    object-fit: contain;
-    border-radius: 4px;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
-}
 
-        /* ZONA DE FOTOGRAFÍAS */
+        /* Foto de José:
+           se mantiene completa y NO se recorta */
+
+        .foto-jose {
+            display: block;
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+            object-position: center;
+            border-radius: 4px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+            flex-shrink: 0;
+        }
+
+        /* ==============================
+           ZONA DE FOTOGRAFÍAS
+           ============================== */
 
         .presentacion {
             position: relative;
             flex: 1;
+            min-height: 0;
             overflow: hidden;
             background: #111111;
         }
+
+        /* Las fotos familiares NO se recortan.
+           Se hacen lo más grandes posible
+           dentro del espacio disponible. */
 
         .presentacion img {
             position: absolute;
@@ -73,6 +89,7 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
+            object-position: center;
             opacity: 0;
             transition: opacity 2s ease-in-out;
         }
@@ -81,7 +98,9 @@
             opacity: 1;
         }
 
-        /* MENSAJE DE CARGA */
+        /* ==============================
+           MENSAJE DE CARGA
+           ============================== */
 
         #cargando {
             position: absolute;
@@ -114,6 +133,7 @@
 
         </header>
 
+
         <main class="presentacion">
 
             <div id="cargando">
@@ -126,6 +146,7 @@
         </main>
 
     </div>
+
 
     <script>
 
