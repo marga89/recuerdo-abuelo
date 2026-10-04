@@ -1,0 +1,73 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>José Ferrer Picó</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #111;
+            font-family: Georgia, "Times New Roman", serif;
+            color: white;
+        }
+
+        .pantalla {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #111;
+        }
+
+        .nombre {
+            font-size: clamp(32px, 5vw, 70px);
+            margin-bottom: 35px;
+            font-weight: normal;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        .foto {
+            width: 65vw;
+            height: 65vh;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        .mensaje {
+            margin-top: 30px;
+            font-size: 20px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="pantalla">
+
+        <div class="nombre">
+            José Ferrer Picó
+        </div>
+
+        <!-- Aquí pondremos la foto principal -->
+        <div class="foto">
+        </div>
+
+    </div>
+
+</body>
+</html>
+```
